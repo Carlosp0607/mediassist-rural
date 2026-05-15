@@ -1,0 +1,24 @@
+/* Contenedor principal — ocupa toda la pantalla en fila horizontal */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Animación de entrada para los mensajes */
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Clase para animar mensajes al aparecer */
+.mensaje-animado {
+  animation: entrar 0.25s ease;
+}
