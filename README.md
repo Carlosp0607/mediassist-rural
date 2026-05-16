@@ -1,16 +1,20 @@
-# React + Vite
+# 🏥 MediAssist Rural
+### Asistente médico con IA para zonas rurales de Colombia
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![MediAssist Rural](https://mediassist-rural.vercel.app)
 
-Currently, two official plugins are available:
+## 🌎 El Problema
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+En Colombia, más de **11 millones de personas** viven en zonas rurales donde el acceso a médicos es limitado o inexistente. Un campesino en el Chocó, una madre en La Guajira, un niño en el Amazonas — todos enfrentan la misma realidad: cuando se enferman, no hay un médico cerca.
 
-## React Compiler
+## 💡 La Solución
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**MediAssist Rural** es un asistente médico de primer nivel impulsado por IA que:
 
-## Expanding the ESLint configuration
+- 🩺 **Orienta sobre síntomas** en lenguaje simple y claro
+- 👤 **Personaliza respuestas** según el perfil del paciente (nombre, edad, condiciones previas)
+- 🚨 **Detecta emergencias** automáticamente y alerta al usuario llamar al 123
+- 💾 **Guarda el historial** de consultas (CRUD completo)
+- 🌐 **Funciona desde cualquier dispositivo** con conexión básica a internet
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🏗️ Arquitectura
