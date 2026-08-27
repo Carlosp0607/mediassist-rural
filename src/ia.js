@@ -28,7 +28,7 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
         messages: [
           { role: 'system', content: systemPrompt },
           ...mensajesFormateados
