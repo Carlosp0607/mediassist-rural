@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Send, Trash2, Edit2, Check, X, AlertTriangle } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 
 function Chat({ mensajes, alEnviar, alBorrar, alEditar, paciente }) {
 
@@ -161,8 +162,10 @@ function Chat({ mensajes, alEnviar, alBorrar, alEditar, paciente }) {
               lineHeight: '1.6',
               border: mensaje.rol === 'usuario' ? 'none' : '1px solid #d0daf0',
               boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-              // Borde rojo si es emergencia
               outline: esEmergencia(mensaje.contenido) ? '2px solid #e74c3c' : 'none',
+              /* AQUÍ SE ARREGLA EL DESBORDE HORIZONTAL */
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word'
             }}>
 
               {/* Alerta de emergencia */}
@@ -209,7 +212,8 @@ function Chat({ mensajes, alEnviar, alBorrar, alEditar, paciente }) {
                   </div>
                 </div>
               ) : (
-                mensaje.contenido
+                /* AQUÍ SE ARREGLA EL TEXTO CON ASTERISCOS */
+                <ReactMarkdown>{mensaje.contenido}</ReactMarkdown>
               )}
             </div>
 

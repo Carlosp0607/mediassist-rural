@@ -1,5 +1,4 @@
 export async function preguntarAIA(mensajes, paciente = {}) {
-  
   const systemPrompt = `Eres MediAssist, un asistente médico de primer nivel diseñado 
 especialmente para zonas rurales de Colombia donde el acceso a médicos es limitado.
 
@@ -24,24 +23,34 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
     content: m.contenido
   }))
 
-  const respuesta = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'nvidia/nemotron-3-nano-30b-a3b:free',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...mensajesFormateados
-      ]
+  try {
+    const respuesta = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...mensajesFormateados
+        ]
+      })
     })
-  })
 
-  const datos = await respuesta.json()
-  
-  if (datos.error) {
-    console.error('Error de la IA:', datos.error)
-    return 'Hubo un error al obtener respuesta.'
+    if (!respuesta.ok) {
+      throw new Error(`Error HTTP: ${respuesta.status}`)
+    }
+
+    const datos = await respuesta.json()
+    
+    if (datos.error) {
+      console.error('Error de la IA:', datos.error)
+      return 'Hubo un error al obtener respuesta de la API.'
+    }
+
+    return datos.choices[0].message.content
+
+  } catch (error) {
+    console.error('Error en la llamada:', error)
+    return 'No se pudo conectar con el servidor. Si estás en entorno local, asegúrate de desplegar a Vercel para probar las API Routes.'
   }
-
-  return datos.choices[0].message.content
 }
