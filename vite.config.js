@@ -1,13 +1,8 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  return {
-    plugins: [react()],
-    define: {
-      'import.meta.env.VITE_OPENROUTER_KEY': JSON.stringify(env.VITE_OPENROUTER_KEY)
-    }
-  }
+// La API key NO debe inyectarse en el bundle del navegador.
+// Vive solo en el backend (api/chat.js) vía process.env.OPENROUTER_API_KEY.
+export default defineConfig({
+  plugins: [react()],
 })
