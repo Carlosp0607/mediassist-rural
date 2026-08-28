@@ -16,17 +16,22 @@ TUS REGLAS:
 6. Guardas contexto del historial de la conversación
 
 IMPORTANTE: Si detectas síntomas de emergencia (dolor pecho, dificultad respirar, 
-sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
+sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`;
 
   const mensajesFormateados = mensajes.map(m => ({
     role: m.rol === 'usuario' ? 'user' : 'assistant',
     content: m.contenido
-  }))
+  }));
 
   try {
-    const respuesta = await fetch('/api/chat', {
+    const API_KEY = import.meta.env.VITE_OPENROUTER_KEY;
+
+    const respuesta = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json' 
+      },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
         messages: [
@@ -34,23 +39,25 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
           ...mensajesFormateados
         ]
       })
-    })
+    });
 
     if (!respuesta.ok) {
-      throw new Error(`Error HTTP: ${respuesta.status}`)
+      const errData = await respuesta.json().catch(() => ({}));
+      console.error('Detalle error HTTP:', respuesta.status, errData);
+      throw new Error(`Error HTTP: ${respuesta.status}`);
     }
 
-    const datos = await respuesta.json()
+    const datos = await respuesta.json();
     
     if (datos.error) {
-      console.error('Error de la IA:', datos.error)
-      return 'Hubo un error al obtener respuesta de la API.'
+      console.error('Error de la IA:', datos.error);
+      return 'Hubo un error al obtener respuesta de la API.';
     }
 
-    return datos.choices[0].message.content
+    return datos.choices[0].message.content;
 
   } catch (error) {
-    console.error('Error en la llamada:', error)
-    return 'No se pudo conectar con el servidor. Si estás en entorno local, asegúrate de desplegar a Vercel para probar las API Routes.'
+    console.error('Error en la llamada:', error);
+    return 'No se pudo conectar con el servidor de la IA.';
   }
 }

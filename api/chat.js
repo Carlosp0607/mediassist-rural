@@ -1,20 +1,23 @@
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
+
+  const API_KEY = process.env.OPENROUTER_API_KEY;
+
   try {
-    const respuesta = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.VITE_OPENROUTER_KEY}`,
-        'HTTP-Referer': 'https://mediassist-rural.vercel.app',
-        'X-Title': 'MediAssist Rural'
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(req.body)
-    })
-    const datos = await respuesta.json()
-    console.log('Respuesta OpenRouter:', JSON.stringify(datos))
-    res.status(200).json(datos)
+    });
+
+    const data = await response.json();
+    return res.status(response.status).json(data);
   } catch (error) {
-    console.error('Error:', error)
-    res.status(500).json({ error: error.message })
+    return res.status(500).json({ error: error.message });
   }
 }
