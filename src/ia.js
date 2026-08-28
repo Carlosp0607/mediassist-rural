@@ -36,21 +36,32 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
       })
     });
 
-    if (!respuesta.ok) {
-      throw new Error(`Error HTTP: ${respuesta.status}`);
+    // Si /api/chat no existe (por ejemplo en `npm run dev`), Vite devuelve el index.html
+    // y esto revienta. Lo detectamos antes de parsear.
+    const tipo = respuesta.headers.get('content-type') || '';
+    if (!tipo.includes('application/json')) {
+      console.error('La ruta /api/chat no devolvió JSON. ¿Estás usando `npm run dev` en vez de `vercel dev`?');
+      return '⚠️ La ruta /api/chat no está disponible. En local usa `vercel dev`; en producción revisa que la carpeta /api se haya desplegado.';
     }
 
     const datos = await respuesta.json();
-    
-    if (datos.error) {
-      console.error('Error de la IA:', datos.error);
-      return 'Hubo un error al obtener respuesta de la API.';
+
+    if (!respuesta.ok || datos.error) {
+      const detalle = datos?.error?.message || datos?.error || `HTTP ${respuesta.status}`;
+      console.error('Error de la IA:', detalle);
+      return `⚠️ No pude responder. Detalle técnico: ${detalle}`;
     }
 
-    return datos.choices[0].message.content;
+    const contenido = datos?.choices?.[0]?.message?.content;
+    if (!contenido) {
+      console.error('Respuesta inesperada de la API:', datos);
+      return '⚠️ La IA devolvió una respuesta vacía. Intenta de nuevo.';
+    }
+
+    return contenido;
 
   } catch (error) {
     console.error('Error en la llamada:', error);
-    return 'No se pudo conectar con el servidor de la IA.';
+    return `⚠️ No se pudo conectar con el servidor de la IA: ${error.message}`;
   }
 }
