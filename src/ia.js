@@ -24,16 +24,9 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
   }));
 
   try {
-    const API_KEY = import.meta.env.VITE_OPENROUTER_KEY;
-
-    const respuesta = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const respuesta = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://mediassist-rural.vercel.app',
-        'X-Title': 'MediAssist Rural'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
         messages: [
@@ -44,8 +37,6 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
     });
 
     if (!respuesta.ok) {
-      const errData = await respuesta.json().catch(() => ({}));
-      console.error('Detalle error HTTP:', respuesta.status, errData);
       throw new Error(`Error HTTP: ${respuesta.status}`);
     }
 
