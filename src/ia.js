@@ -30,7 +30,9 @@ sangrado severo, pérdida de consciencia) indica IR A URGENCIAS INMEDIATAMENTE.`
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://mediassist-rural.vercel.app',
+        'X-Title': 'MediAssist Rural'
       },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
