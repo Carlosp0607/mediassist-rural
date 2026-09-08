@@ -1,20 +1,105 @@
-# 🏥 MediAssist Rural
-### Asistente médico con IA para zonas rurales de Colombia
+# MediAssist Rural
 
-![MediAssist Rural](https://mediassist-rural.vercel.app)
+Asistente de orientación en salud con IA, pensado para zonas de Colombia con acceso médico limitado.
 
-## 🌎 El Problema
+**Demo:** [mediassist-rural.vercel.app](https://mediassist-rural.vercel.app)
 
-En Colombia, más de **11 millones de personas** viven en zonas rurales donde el acceso a médicos es limitado o inexistente. Un campesino en el Chocó, una madre en La Guajira, un niño en el Amazonas — todos enfrentan la misma realidad: cuando se enferman, no hay un médico cerca.
+---
 
-## 💡 La Solución
+## El problema
 
-**MediAssist Rural** es un asistente médico de primer nivel impulsado por IA que:
+En Colombia más de 11 millones de personas viven en zonas rurales donde el acceso a un médico es limitado o inexistente. Cuando alguien se enferma en el Chocó, La Guajira o el Amazonas, la primera pregunta no es qué tratamiento seguir, sino si esto amerita salir a buscar atención.
 
-- 🩺 **Orienta sobre síntomas** en lenguaje simple y claro
-- 👤 **Personaliza respuestas** según el perfil del paciente (nombre, edad, condiciones previas)
-- 🚨 **Detecta emergencias** automáticamente y alerta al usuario llamar al 123
-- 💾 **Guarda el historial** de consultas (CRUD completo)
-- 🌐 **Funciona desde cualquier dispositivo** con conexión básica a internet
+MediAssist Rural no reemplaza a un médico. Responde esa primera pregunta.
 
-## 🏗️ Arquitectura
+---
+
+## Qué hace
+
+- **Orienta sobre síntomas** en lenguaje simple, sin terminología clínica.
+- **Personaliza la respuesta** con los datos que entrega el paciente: nombre, edad y condiciones previas.
+- **Detecta señales de urgencia** en la consulta y muestra una alerta con la línea de emergencias 123.
+- **Guarda el historial** de consultas en el navegador.
+- **Funciona en cualquier dispositivo** con conexión básica a internet.
+
+---
+
+## Arquitectura
+
+```
+Navegador (React 19 + Vite)
+        │
+        │  POST /api/chat
+        ▼
+Función serverless en Vercel  (api/chat.js)
+        │
+        │  Guarda la clave de API en el servidor,
+        │  nunca se expone al cliente
+        ▼
+OpenRouter  →  meta-llama/llama-3.1-8b-instruct
+```
+
+La llamada al modelo no se hace desde el navegador. Pasa por una función serverless en Vercel que actúa como intermediario, para que la clave de API viva en variables de entorno del servidor y no en el bundle de JavaScript que descarga el usuario.
+
+---
+
+## Detección de urgencias
+
+Es la parte del sistema que más cuidado exige: un asistente de salud que no distingue entre una molestia leve y una emergencia real puede hacer daño.
+
+El flujo revisa la consulta contra un conjunto de señales de urgencia. Cuando encuentra una, la interfaz renderiza una alerta visible con la línea de emergencias 123 por encima de cualquier otra respuesta. La orientación general queda en segundo plano; lo primero que ve el usuario es la indicación de buscar atención inmediata.
+
+---
+
+## Stack
+
+| Componente | Tecnología |
+|---|---|
+| Interfaz | React 19 |
+| Build | Vite |
+| Iconos | lucide-react |
+| Formato de respuesta | react-markdown |
+| Backend | Función serverless de Vercel |
+| Modelo | Llama 3.1 8B Instruct vía OpenRouter |
+| Despliegue | Vercel |
+
+---
+
+## Ejecución local
+
+```bash
+git clone https://github.com/Carlosp0607/mediassist-rural.git
+cd mediassist-rural
+npm install
+```
+
+Crea un archivo `.env` en la raíz:
+
+```
+OPENROUTER_API_KEY=tu_clave_de_openrouter
+```
+
+```bash
+npm run dev
+```
+
+---
+
+## Estructura
+
+```
+api/chat.js         Función serverless: recibe la consulta y llama al modelo
+src/
+  App.jsx           Componente raíz y estado de la conversación
+  ia.js             Cliente de la API y armado del prompt
+  components/       Interfaz de chat, formulario de paciente y alertas
+  App.css
+public/             Iconos y favicon
+vercel.json         Configuración de despliegue
+```
+
+---
+
+## Aviso
+
+Esta aplicación entrega orientación general en salud. No emite diagnósticos ni prescribe tratamientos, y no sustituye la consulta con un profesional de la salud. Ante una urgencia, la indicación es llamar al 123.
