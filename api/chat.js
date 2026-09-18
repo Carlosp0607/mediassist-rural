@@ -1,6 +1,7 @@
 const MODELO = 'meta-llama/llama-3.1-8b-instruct';
-const MAX_MENSAJES = 30;
-const MAX_CARACTERES = 4000;
+const MAX_MENSAJES = 40;          // mensajes de conversación que se envían al modelo
+const MAX_CARACTERES = 8000;      // tamaño máximo por mensaje (lo que pase se recorta)
+const MAX_SISTEMA = 4000;         // tamaño máximo del mensaje de sistema
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,18 +13,28 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Falta la API Key en el servidor.' });
   }
 
-  const mensajes = req.body?.messages;
-  if (!Array.isArray(mensajes) || mensajes.length === 0 || mensajes.length > MAX_MENSAJES) {
+  const recibidos = req.body?.messages;
+  if (!Array.isArray(recibidos) || recibidos.length === 0) {
     return res.status(400).json({ error: 'Formato de mensajes inválido.' });
   }
 
-  const rolesValidos = ['system', 'user', 'assistant'];
-  const limpios = [];
-  for (const m of mensajes) {
-    if (!m || !rolesValidos.includes(m.role) || typeof m.content !== 'string' || m.content.length > MAX_CARACTERES) {
-      return res.status(400).json({ error: 'Mensaje inválido.' });
-    }
-    limpios.push({ role: m.role, content: m.content });
+  // Descarta lo que no tenga forma de mensaje y recorta los textos largos
+  const validos = recibidos.filter(
+    m => m && ['system', 'user', 'assistant'].includes(m.role) && typeof m.content === 'string'
+  );
+
+  const sistema = validos
+    .filter(m => m.role === 'system')
+    .slice(0, 1)
+    .map(m => ({ role: 'system', content: m.content.slice(0, MAX_SISTEMA) }));
+
+  const conversacion = validos
+    .filter(m => m.role !== 'system')
+    .slice(-MAX_MENSAJES)
+    .map(m => ({ role: m.role, content: m.content.slice(0, MAX_CARACTERES) }));
+
+  if (conversacion.length === 0) {
+    return res.status(400).json({ error: 'No hay mensajes para enviar.' });
   }
 
   try {
@@ -35,7 +46,7 @@ export default async function handler(req, res) {
         'HTTP-Referer': 'https://mediassist-rural.vercel.app',
         'X-Title': 'MediAssist Rural'
       },
-      body: JSON.stringify({ model: MODELO, messages: limpios })
+      body: JSON.stringify({ model: MODELO, messages: [...sistema, ...conversacion] })
     });
 
     const texto = await response.text();
