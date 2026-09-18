@@ -18,7 +18,7 @@ MediAssist Rural no reemplaza a un médico. Responde esa primera pregunta.
 
 - **Orienta sobre síntomas** en lenguaje simple, sin terminología clínica.
 - **Personaliza la respuesta** con los datos que entrega el paciente: nombre, edad y condiciones previas.
-- **Detecta señales de urgencia** en la consulta y muestra una alerta con la línea de emergencias 123.
+- **Detecta señales de urgencia** en cada respuesta y muestra una alerta con la línea de emergencias 123.
 - **Guarda el historial** de consultas en el navegador.
 - **Funciona en cualquier dispositivo** con conexión básica a internet.
 
@@ -39,7 +39,7 @@ Función serverless en Vercel  (api/chat.js)
 OpenRouter  →  meta-llama/llama-3.1-8b-instruct
 ```
 
-La llamada al modelo no se hace desde el navegador. Pasa por una función serverless en Vercel que actúa como intermediario, para que la clave de API viva en variables de entorno del servidor y no en el bundle de JavaScript que descarga el usuario.
+La llamada al modelo no se hace desde el navegador. Pasa por una función serverless en Vercel que actúa como intermediario, para que la clave de API viva en variables de entorno del servidor y no en el bundle de JavaScript que descarga el usuario. La función fija el modelo, valida el formato de cada mensaje y limita el tamaño de la conversación, para que nadie pueda usarla como acceso libre a la API.
 
 ---
 
@@ -47,7 +47,7 @@ La llamada al modelo no se hace desde el navegador. Pasa por una función server
 
 Es la parte del sistema que más cuidado exige: un asistente de salud que no distingue entre una molestia leve y una emergencia real puede hacer daño.
 
-El flujo revisa la consulta contra un conjunto de señales de urgencia. Cuando encuentra una, la interfaz renderiza una alerta visible con la línea de emergencias 123 por encima de cualquier otra respuesta. La orientación general queda en segundo plano; lo primero que ve el usuario es la indicación de buscar atención inmediata.
+Cada respuesta del asistente se revisa contra un conjunto de señales de urgencia. Cuando encuentra una, la interfaz renderiza una alerta visible con la línea de emergencias 123 junto a esa respuesta. La orientación general queda en segundo plano; lo primero que ve el usuario es la indicación de buscar atención inmediata.
 
 ---
 
@@ -79,8 +79,11 @@ Crea un archivo `.env` en la raíz:
 OPENROUTER_API_KEY=tu_clave_de_openrouter
 ```
 
+Levanta la interfaz y la función `/api/chat` juntas con la CLI de Vercel:
+
 ```bash
-npm run dev
+npm install -g vercel
+vercel dev
 ```
 
 ---
